@@ -1,0 +1,34 @@
+# AICODE-NOTE: The buf.build/bitgn/api Go SDK currently ships pcm.proto and
+# mini.proto into the same `vm` Go package, where their `ReadRequest`,
+# `WriteRequest`, etc. collide — so the upstream package does not compile.
+#
+# As a workaround we generate our own Go + Connect stubs from ../proto into
+# ./gen/, pinning every file to its own import path via the `M` directives so
+# each .proto lands in a distinct Go package.
+#
+# Run `make gen` (or `buf generate` from this directory) to regenerate.
+version: v2
+
+managed:
+  enabled: false
+
+inputs:
+  - directory: ../proto
+
+plugins:
+  - local: protoc-gen-go
+    out: gen
+    opt:
+      - paths=import
+      - module=bitgn.com/samples/pac1-go/gen
+      - Mbitgn/harness.proto=bitgn.com/samples/pac1-go/gen/bitgn/harness;harness
+      - Mbitgn/vm/pcm.proto=bitgn.com/samples/pac1-go/gen/bitgn/vm/pcm;pcm
+      - Mbitgn/vm/mini.proto=bitgn.com/samples/pac1-go/gen/bitgn/vm/mini;mini
+  - local: protoc-gen-connect-go
+    out: gen
+    opt:
+      - paths=import
+      - module=bitgn.com/samples/pac1-go/gen
+      - Mbitgn/harness.proto=bitgn.com/samples/pac1-go/gen/bitgn/harness;harness
+      - Mbitgn/vm/pcm.proto=bitgn.com/samples/pac1-go/gen/bitgn/vm/pcm;pcm
+      - Mbitgn/vm/mini.proto=bitgn.com/samples/pac1-go/gen/bitgn/vm/mini;mini
