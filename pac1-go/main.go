@@ -13,18 +13,13 @@ import (
 	"connectrpc.com/connect"
 )
 
-func env(name, fallback string) string {
-	if v := os.Getenv(name); v != "" {
-		return v
-	}
-	return fallback
-}
-
 func main() {
-	bitgnURL := env("BITGN_HOST", "https://api.bitgn.com")
+	loadDotEnv(".env")
+
+	bitgnURL := envOr("BITGN_HOST", "https://api.bitgn.com")
 	bitgnAPIKey := os.Getenv("BITGN_API_KEY")
-	benchID := env("BENCH_ID", "bitgn/pac1-dev")
-	modelID := env("MODEL_ID", "gpt-4.1-2025-04-14")
+	benchID := envOr("BENCH_ID", "bitgn/pac1-dev")
+	modelID := envOr("MODEL_ID", "gpt-4.1-2025-04-14")
 
 	taskFilter := map[string]bool{}
 	for _, t := range os.Args[1:] {

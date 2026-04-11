@@ -6,13 +6,27 @@ Runnable Go port of `pac1-py`. Same control-plane flow
 
 ## Quick start
 
-1. `export OPENAI_API_KEY=...` (required — the agent calls `gpt-4.1` by default).
-2. Optional overrides:
-   - `BITGN_HOST`    (default `https://api.bitgn.com`)
-   - `BITGN_API_KEY` (required for leaderboard `StartRun`)
-   - `BENCH_ID`      (default `bitgn/pac1-dev`)
-   - `MODEL_ID`      (default `gpt-4.1-2025-04-14`)
-   - `HINT`          (appended to the system prompt)
+1. Copy `.env.example` to `.env` and drop in your personal hackathon key:
+
+   ```bash
+   cp .env.example .env
+   # edit .env and set PROXY_API_KEY=<your-personal-key>
+   ```
+
+   The agent auto-loads `./.env` at startup (existing env vars win). A full
+   run of the sample can cost ~$2 of the $40 proxy credit, so keep an eye on
+   usage.
+
+2. Optional overrides (env vars or extra lines in `.env`):
+   - `OPENAI_BASE_URL` (default `http://hackathon-proxy.westeurope.azurecontainer.io:3000/v1`)
+   - `PROXY_API_KEY`   — personal hackathon proxy key (do **not** share)
+   - `OPENAI_API_KEY`  — only needed if hitting OpenAI directly instead of the proxy
+   - `BITGN_HOST`      (default `https://api.bitgn.com`)
+   - `BITGN_API_KEY`   — required for leaderboard `StartRun`
+   - `BENCH_ID`        (default `bitgn/pac1-dev`)
+   - `MODEL_ID`        (default `gpt-4.1-2025-04-14`)
+   - `HINT`            — appended to the system prompt
+
 3. Build and run:
 
    ```bash

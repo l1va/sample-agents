@@ -13,6 +13,7 @@ import (
 	"bitgn.com/samples/pac1-go/gen/bitgn/vm/pcm/pcmconnect"
 	"connectrpc.com/connect"
 	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/packages/param"
 	"github.com/openai/openai-go/v3/shared"
 	"github.com/openai/openai-go/v3/shared/constant"
@@ -197,9 +198,21 @@ func jsonDump(v any) string {
 	return string(b)
 }
 
+// Hackathon proxy defaults — override via OPENAI_BASE_URL / PROXY_API_KEY
+// (or OPENAI_API_KEY if you're hitting OpenAI directly).
+const defaultOpenAIBaseURL = "http://hackathon-proxy.westeurope.azurecontainer.io:3000/v1"
+
 // runAgent is the SGR loop — one trial's worth of work.
 func runAgent(ctx context.Context, model, harnessURL, taskText string) error {
-	openaiClient := openai.NewClient() // picks up OPENAI_API_KEY from env
+	opts := []option.RequestOption{
+		option.WithBaseURL(envOr("OPENAI_BASE_URL", defaultOpenAIBaseURL)),
+	}
+	if key := os.Getenv("PROXY_API_KEY"); key != "" {
+		opts = append(opts, option.WithAPIKey(key))
+	}
+	// openai.NewClient falls back to OPENAI_API_KEY from the env if neither
+	// PROXY_API_KEY nor an explicit WithAPIKey is supplied.
+	openaiClient := openai.NewClient(opts...)
 
 	vm := pcmconnect.NewPcmRuntimeClient(http.DefaultClient, harnessURL)
 
